@@ -1,5 +1,5 @@
 ﻿//Crit damagers
-double DMG;
+/*double DMG;
 double DMG_Average_Mod;
 
 double ATK = 3678;
@@ -129,4 +129,4 @@ Anomaly_Buildup_RES_Mod = 1 - (Target_Anomaly_RES - ОЈAnomaly_RES_Reduction);
 
 Buildup = Base_Buildup * Anomaly_Buildup_Bonus_Mod * Anomaly_Buildup_Bonus_Mod * Anomaly_Buildup_RES_Mod;
 
-Console.WriteLine("Anomaly Buildup " + Buildup);
+Console.WriteLine("Anomaly Buildup " + Buildup);*/
