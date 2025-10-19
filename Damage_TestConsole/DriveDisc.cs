@@ -8,16 +8,50 @@ namespace Damage_TestConsole
 {
     internal class DriveDisc
     {
-        //Astral Voice
-        //2 флет
-        double AstralVoice_2_buff_ATK = 0.1;
-        double AstralVoice_4_buff_DMG = 0.24;
-        //Branch Blade Song
-        double BranchBladeSong_2_buff_CritDMG = 0.16;
-        double BranchBladeSong_4_buff_CritRate = 0.12;
-        double BranchBladeSong_4_buff_CritDMG = 0.3;
-        //Chaos Jazz
-        double ChaosJazz_2_buff_AP = 30;
+        public class CombatATK_Bufs
+        {
+            public class AstralVoice
+            {
+                public double AstralVoice_2_ATK { get; } = 0.1;
+            }
+        }
+
+        public class CritRate_Bufs
+        {
+            public class BranchBladeSong
+            {
+                public double BranchBladeSong_2_CritDMG { get; } = 0.16;
+                public double BranchBladeSong_4_CritRate { get; } = 0.12;
+            }
+            
+        }
+
+        public class CritDMG_Bufs
+        {
+            public class BranchBladeSong
+            {
+                public double BranchBladeSong_4_buff_CritDMG { get; } = 0.3;
+            }
+        }
+        public class AP_Bufs
+        {
+            public class ChaosJazz
+            {
+                double ChaosJazz_2_buff_AP { get; } = 30;
+            }
+
+        }
+
+        public class DMG_Bufs
+        {
+            public class AstralVoice
+            {
+                public double[] AstralVoice_4_buff_DMG { get; } = { 0.08, 0.16, 0.24 };
+            }
+        }
+        
+        //ChaosJazz
+        
         double ChaosJazz_4_buff_Fire_Electric_DMG = 0.15;
         double ChaosJazz_4_buff_exDMG = 0.2;
         //Chaotic Metal
