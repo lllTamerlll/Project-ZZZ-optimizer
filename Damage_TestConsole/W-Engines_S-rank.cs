@@ -8,6 +8,36 @@ namespace Damage_TestConsole
 {
     internal class W_Engines_S_rank
     {
+        public string name1 = "Steel Cushion";
+        public string name2 = "The Brimstone";
+        public string name3 = "Kraken’s Cradle";
+        public string name4 = "Tusks of Fury";
+        public string name5 = "Hailstorm Shrine";
+        public string name6 = "Hellfire Gears";
+        public string name7 = "The Restrained";
+        public string name8 = "Blazing Laurel";
+        public string name9 = "Flamemaker Shaker";
+        public string name10 = "Fusion Compiler";
+        public string name11 = "Deep Sea Visitor";
+        public string name12 = "Zanshin Herb Case";
+        public string name13 = "Weeping Cradle";
+        public string name14 = "Timeweaver";
+        public string name15 = "Riot Suppressor Mark VI";
+        public string name16 = "Ice-Jade Teapot";
+        public string name17 = "Sharpened Stinger";
+        public string name18 = "Myriad Eclipse";
+        public string name19 = "Bellicose Blaze";
+        public string name20 = "Elegant Vanity";
+        public string name21 = "Heartstring Nocturne";
+        public string name22 = "Flight of Fancy";
+        public string name23 = "Spectral Gaze";
+        public string name24 = "Qingming Birdcage";
+        public string name25 = "Severed Innocence";
+        public string name26 = "Roaring Furnace";
+        public string name27 = "Practiced Perfection";
+        public string name28 = "Metanukimorp";
+        public string name29 = "Dreamlit Hearth";
+        public string name30 = "Cordis Germina";
         public class Main
         {
             public class SteelCushion

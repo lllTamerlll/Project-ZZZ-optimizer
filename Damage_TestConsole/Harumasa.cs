@@ -9,7 +9,9 @@ namespace Damage_TestConsole
 {
     internal class Harumasa
     {
-        public class Skills
+
+        public string name = "Харумаса";
+            public class Skills
         {
             public class Basic
             {

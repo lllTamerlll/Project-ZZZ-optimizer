@@ -8,6 +8,38 @@ namespace Damage_TestConsole
 {
     internal class W_Engines_A_rank
     {
+        public string name1 = "Street Superstar";
+        public string name2 = "Slice of Time";
+        public string name3 = "Rainforest Gourmet";
+        public string name4 = "Starlight Engine";
+        public string name5 = "Steam Oven";
+        public string name6 = "Precious Fossilized Core";
+        public string name7 = "Original Transmorpher";
+        public string name8 = "Weeping Gemini";
+        public string name9 = "Electro-Lip Gloss";
+        public string name10 = "Bunny Band";
+        public string name11 = "Spring Embrace";
+        public string name12 = "Puzzle Sphere";
+        public string name13 = "Gilded Blossom";
+        public string name14 = "Radiowave Journey";
+        public string name15 = "Marcato Desire";
+        public string name16 = "Reel Projector";
+        public string name17 = "Demara Battery Mark II";
+        public string name18 = "The Vault";
+        public string name19 = "Housekeeper";
+        public string name20 = "Starlight Engine Replica";
+        public string name21 = "Drill Rig - Red Axis";
+        public string name22 = "Big Cylinder";
+        public string name23 = "Bashful Demon";
+        public string name24 = "Kaboom the Cannon";
+        public string name25 = "Peacekeeper - Specialized";
+        public string name26 = "Roaring Ride";
+        public string name27 = "Box Cutter";
+        public string name28 = "Tremor Trigram Vessel";
+        public string name29 = "Grill O'Wisp";
+        public string name30 = "Cannon Rotor";
+        public string name31 = "Unfettered Game Ball";
+        public string name32 = "Six Shooter";
         public class Main
         {
             public class StreetSuperstar

@@ -8,6 +8,50 @@ namespace Damage_TestConsole
 {
     internal class DriveDisc
     {
+        //MoonlightLullaby
+        public string name1 = "Moonlight Lullaby";
+        //DawnBloom
+        public string name2 = "Dawn's Bloom";
+        //KingoftheSummit
+        public string name3 = "King of the Summit";
+        //YunkuiTales
+        public string name4 = "Yunkui Tales";
+        //PhaethonMelody
+        public string name5 = "Phaethon's Melody";
+        //ShadowHarmony
+        public string name6 = "Shadow Harmony";
+        //Astral_Voice
+        public string name7 = "Astral Voice";
+        //BranchBladeSong
+        public string name8 = "Branch & Blade Song";
+        //FangedMetal
+        public string name9 = "Fanged Metal";
+        //PolarMetal
+        public string name10 = "Polar Metal";
+        //ThunderMetal
+        public string name11 = "Thunder Metal";
+        //ChaoticMetal
+        public string name12 = "Chaotic Metal";
+        //InfernoMetal
+        public string name13 = "Inferno Metal";
+        //ProtoPunk
+        public string name14 = "Proto Punk";
+        //ChaosJazz
+        public string name15 = "Chaos Jazz";
+        //SwingJazz
+        public string name16 = "Swing Jazz";
+        //SoulRock
+        public string name17 = "Soul Rock";
+        //HormonePunk
+        public string name18 = "Hormone Punk";
+        //FreedomBlues
+        public string name19 = "Freedom Blues";
+        //ShockstarDisco
+        public string name20 = "Shockstar Disco";
+        //ShockstarDisco
+        public string name21 = "Puffer Electro";
+        //WoodpeckerElectro
+        public string name22 = "Woodpecker Electro";
         public class CombatATK_Bufs
         {
             public class AstralVoice

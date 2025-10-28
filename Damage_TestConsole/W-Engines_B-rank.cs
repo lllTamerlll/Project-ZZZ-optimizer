@@ -8,6 +8,21 @@ namespace Damage_TestConsole
 {
     internal class W_Engines_B_rank
     {
+        public string name1 = "[Lunar] Pleniluna";
+        public string name2 = "[Lunar] Decrescent";
+        public string name3 = "[Lunar] Noviluna";
+        public string name4 = "[Reverb] Mark I";
+        public string name5 = "[Reverb] Mark II";
+        public string name6 = "[Reverb] Mark III";
+        public string name7 = "[Vortex] Revolver";
+        public string name8 = "[Vortex] Arrow";
+        public string name9 = "[Vortex] Hatchet";
+        public string name10 = "[Magnetic Storm] Alpha";
+        public string name11 = "[Magnetic Storm] Bravo";
+        public string name12 = "[Magnetic Storm] Charlie";
+        public string name13 = "[Identity] Base";
+        public string name14 = "[Identity] Inflection";
+        public string name15 = "[Cinder] Cobalt";
         public class Main
         {
             public class LunarPleniluna
