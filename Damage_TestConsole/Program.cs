@@ -50,6 +50,7 @@ namespace Damage_TestConsole
         public double IceDMG { get; set; } = 0;
         public double PhysicalDMG { get; set; } = 0;
         public double EtherDMG { get; set; } = 0;
+        public double WindDMG { get; set; } = 0;
 
         // HP Stats
         public double HP { get; set; } = 0;
@@ -58,6 +59,9 @@ namespace Damage_TestConsole
         // DEF Stats
         public double DEF { get; set; } = 0;
         public double DEFPercentStat { get; set; } = 0;
+
+        // Utility Stats
+        public double EffectHitRate { get; set; } = 0;
 
         // Временные переменные для расчета
         public double BaseDMG { get; set; } = 0;
@@ -125,6 +129,7 @@ namespace Damage_TestConsole
             else
             {
                 ShowErrorMessage("Неверный ввод. Введите число");
+                SelectAgent();
             }
         }
 
@@ -163,6 +168,7 @@ namespace Damage_TestConsole
                     break;
                 default:
                     ShowErrorMessage("Неверный выбор агента");
+                    SelectAgent();
                     break;
             }
         }
@@ -180,104 +186,182 @@ namespace Damage_TestConsole
             var dodge = new Harumasa.Skills.Dodge();
             var chain = new Harumasa.Skills.Chain();
 
-            Console.WriteLine("\nВыберите навык для расчета урона:");
-            Console.WriteLine("1 - Basic Attack: Fifth Hit (Пятый удар)");
-            Console.WriteLine("2 - Special Skill: Heavenly Net (Небесная сеть)");
-            Console.WriteLine("3 - Quick Assist: Piercing String (Пронзающая струна)");
-            Console.WriteLine("4 - Dash Attack: Flying String (Летящая струна)");
-            Console.WriteLine("5 - Dodge Counter: Hidden Edge (Скрытый клинок)");
-            Console.WriteLine("6 - Chain Skill: Meet and Depart (Встреча и расставание)");
-            Console.WriteLine("7 - Ultimate Skill: Zanshin (Дзансин)");
+            Console.WriteLine("\nВыберите навык для расчета урона (введите два числа через пробел):");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
+            Console.WriteLine("1 - Basic Attack: Cloud Piercer");
+            Console.WriteLine("   1 - First Hit");
+            Console.WriteLine("   2 - Second Hit");
+            Console.WriteLine("   3 - Third Hit");
+            Console.WriteLine("   4 - Fourth Hit");
+            Console.WriteLine("   5 - Fifth Hit");
+            Console.WriteLine("   6 - Cloud Piercer Shift");
+            Console.WriteLine("   7 - Falling Feather");
+            Console.WriteLine("   8 - A-B Arrows");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
+            Console.WriteLine("2 - Special Skill: Heavenly Net");
+            Console.WriteLine("   1 - Heavenly Net");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
+            Console.WriteLine("3 - Quick Assist");
+            Console.WriteLine("   1 - Piercing String");
+            Console.WriteLine("   2 - Stance Slash");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
+            Console.WriteLine("4 - Dash Attack");
+            Console.WriteLine("   1 - Flying String");
+            Console.WriteLine("   2 - Hidden Edge");
+            Console.WriteLine("   3 - Dash First Hit");
+            Console.WriteLine("   4 - Dash Second Hit");
+            Console.WriteLine("   5 - Dash Third Hit");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
+            Console.WriteLine("5 - Chain Skill");
+            Console.WriteLine("   1 - Meet and Depart");
+            Console.WriteLine("   2 - Zanshin");
+            Console.WriteLine("──────────────────────────────────────────────────────────────");
 
             string skillInput = GetUserInput();
+            string[] skillParts = skillInput.Split(' ');
 
-            if (int.TryParse(skillInput, out int skillChoice))
+            if (skillParts.Length == 2 && int.TryParse(skillParts[0], out int skillType) &&
+                int.TryParse(skillParts[1], out int skillNumber))
             {
-                double[] selectedSkill = GetSelectedSkill(skillChoice, basic, special, assist, dodge, chain);
+                double[] selectedSkill = GetSelectedSkill(skillType, skillNumber, basic, special, assist, dodge, chain);
 
-                Console.WriteLine($"\nВыберите уровень навыка (1-{selectedSkill.Length}):");
-                string levelInput = GetUserInput();
-
-                if (int.TryParse(levelInput, out int skillLevel) && skillLevel >= 1 && skillLevel <= selectedSkill.Length)
+                if (selectedSkill != null)
                 {
-                    currentStats.SkillMV = selectedSkill[skillLevel - 1];
-                    Console.WriteLine($"✓ Установлен множитель навыка: {currentStats.SkillMV:P1}");
+                    Console.WriteLine($"\nВыберите уровень навыка (1-{selectedSkill.Length}):");
+                    string levelInput = GetUserInput();
+
+                    if (int.TryParse(levelInput, out int skillLevel) && skillLevel >= 1 && skillLevel <= selectedSkill.Length)
+                    {
+                        currentStats.SkillMV = selectedSkill[skillLevel - 1];
+                        Console.WriteLine($"✓ Установлен множитель навыка: {currentStats.SkillMV:P1}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Неверный уровень! Установлен уровень 1");
+                        currentStats.SkillMV = selectedSkill[0];
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Неверный уровень! Установлен уровень 1");
-                    currentStats.SkillMV = selectedSkill[0];
+                    Console.WriteLine("Неверный выбор навыка! Установлен Fifth Hit уровень 1");
+                    currentStats.SkillMV = basic.fifth_cloudpiercer_hit[0];
                 }
+            }
+            else
+            {
+                Console.WriteLine("Неверный формат ввода! Установлен Fifth Hit уровень 1");
+                currentStats.SkillMV = basic.fifth_cloudpiercer_hit[0];
             }
         }
 
-        static double[] GetSelectedSkill(int choice,
+        static double[] GetSelectedSkill(int skillType, int skillNumber,
             Harumasa.Skills.Basic basic,
             Harumasa.Skills.Special special,
             Harumasa.Skills.Assist assist,
             Harumasa.Skills.Dodge dodge,
             Harumasa.Skills.Chain chain)
         {
-            switch (choice)
+            switch (skillType)
             {
-                case 1:
-                    return basic.fifth_cloudpiercer_hit;
-                case 2:
-                    return special.heavenlynet;
-                case 3:
-                    return assist.piercingstring;
-                case 4:
-                    return dodge.flyingstring;
-                case 5:
-                    return dodge.hiddenedge;
-                case 6:
-                    return chain.meetanddepart;
-                case 7:
-                    return chain.zanshin;
+                case 1: // Basic Attack
+                    switch (skillNumber)
+                    {
+                        case 1: return basic.first_cloudpiercer_hit;
+                        case 2: return basic.second_cloudpiercer_hit;
+                        case 3: return basic.third_cloudpiercer_hitv;
+                        case 4: return basic.fourth_cloudpiercer_hit;
+                        case 5: return basic.fifth_cloudpiercer_hit;
+                        case 6: return basic.cloudpiercershift_hit;
+                        case 7: return basic.fallingfeather_hit;
+                        case 8: return basic.ABarrows;
+                        default: return null;
+                    }
+                case 2: // Special Skill
+                    switch (skillNumber)
+                    {
+                        case 1: return special.heavenlynet;
+                        default: return null;
+                    }
+                case 3: // Quick Assist
+                    switch (skillNumber)
+                    {
+                        case 1: return assist.piercingstring;
+                        case 2: return assist.stanceslash;
+                        default: return null;
+                    }
+                case 4: // Dash Attack
+                    switch (skillNumber)
+                    {
+                        case 1: return dodge.flyingstring;
+                        case 2: return dodge.hiddenedge;
+                        case 3: return dodge.dash_first_hit;
+                        case 4: return dodge.dash_second_hit;
+                        case 5: return dodge.dash_third_hit;
+                        default: return null;
+                    }
+                case 5: // Chain Skill
+                    switch (skillNumber)
+                    {
+                        case 1: return chain.meetanddepart;
+                        case 2: return chain.zanshin;
+                        default: return null;
+                    }
                 default:
-                    return basic.fifth_cloudpiercer_hit;
+                    return null;
             }
         }
 
         static void SelectWeaponRarity()
         {
-            Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                   ВЫБОР РЕДКОСТИ ОРУЖИЯ                     ║");
-            Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
-
-            Console.WriteLine("\nВведите редкость оружия:");
-            Console.WriteLine("B-ранк - 1");
-            Console.WriteLine("A-ранк - 2");
-            Console.WriteLine("S-ранк - 3");
-
-            string input = GetUserInput();
-
-            if (int.TryParse(input, out int rarityChoice))
+            while (true)
             {
-                ProcessWeaponRaritySelection(rarityChoice);
-            }
-            else
-            {
-                ShowErrorMessage("Неверный ввод. Введите число");
+                Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
+                Console.WriteLine("║                   ВЫБОР РЕДКОСТИ ОРУЖИЯ                     ║");
+                Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
+
+                Console.WriteLine("\nВведите редкость оружия:");
+                Console.WriteLine("Без оружия - 0");
+                Console.WriteLine("B-ранк - 1");
+                Console.WriteLine("A-ранк - 2");
+                Console.WriteLine("S-ранк - 3");
+
+                string input = GetUserInput();
+
+                if (int.TryParse(input, out int rarityChoice))
+                {
+                    if (rarityChoice == 0)
+                    {
+                        Console.WriteLine("\n✓ Выбрано: Без оружия");
+                        break;
+                    }
+                    else if (ProcessWeaponRaritySelection(rarityChoice))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    ShowErrorMessage("Неверный ввод. Введите число");
+                }
             }
         }
 
-        static void ProcessWeaponRaritySelection(int rarityChoice)
+        static bool ProcessWeaponRaritySelection(int rarityChoice)
         {
             switch (rarityChoice)
             {
                 case 1:
                     SelectBWeapon();
-                    break;
+                    return true;
                 case 2:
                     SelectAWeapon();
-                    break;
+                    return true;
                 case 3:
                     SelectSWeapon();
-                    break;
+                    return true;
                 default:
                     ShowErrorMessage("Неверный выбор редкости");
-                    break;
+                    return false;
             }
         }
 
@@ -661,7 +745,6 @@ namespace Damage_TestConsole
             int totalSlots = 6;
             int usedSlots = 0;
             List<string> selectedSets = new List<string>();
-            Dictionary<string, int> setStacks = new Dictionary<string, int>();
 
             Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
             Console.WriteLine("║                   ВЫБОР АРТЕФАКТОВ                          ║");
@@ -679,783 +762,440 @@ namespace Damage_TestConsole
                 Console.WriteLine("└────────────────────────────────────────────────────────────┘");
 
                 Console.WriteLine("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                Console.WriteLine("                   ВЫБЕРИТЕ СЕТ АРТЕФАКТОВ:");
+                Console.WriteLine("                   ВЫБОР НАБОРА АРТЕФАКТОВ");
                 Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 
-                Console.WriteLine("1  │ Moonlight Lullaby");
-                Console.WriteLine("2  │ Dawn's Bloom");
-                Console.WriteLine("3  │ King of the Summit");
-                Console.WriteLine("4  │ Yunkui Tales");
-                Console.WriteLine("5  │ Phaethon's Melody");
-                Console.WriteLine("6  │ Shadow Harmony");
-                Console.WriteLine("7  │ Astral Voice");
-                Console.WriteLine("8  │ Branch & Blade Song");
-                Console.WriteLine("9  │ Fanged Metal");
-                Console.WriteLine("10 │ Polar Metal");
-                Console.WriteLine("11 │ Thunder Metal");
-                Console.WriteLine("12 │ Chaotic Metal");
-                Console.WriteLine("13 │ Inferno Metal");
-                Console.WriteLine("14 │ Proto Punk");
-                Console.WriteLine("15 │ Chaos Jazz");
-                Console.WriteLine("16 │ Swing Jazz");
-                Console.WriteLine("17 │ Soul Rock");
-                Console.WriteLine("18 │ Hormone Punk");
-                Console.WriteLine("19 │ Freedom Blues");
-                Console.WriteLine("20 │ Shockstar Disco");
-                Console.WriteLine("21 │ Puffer Electro");
-                Console.WriteLine("22 │ Woodpecker Electro");
-                Console.WriteLine("0  │ ЗАВЕРШИТЬ ВЫБОР");
-                Console.WriteLine("──────────────────────────────────────────────────────────────");
-                Console.Write("Введите номер сета: ");
+                Console.WriteLine("1 - Meteor Hunter");
+                Console.WriteLine("2 - Pan-Galactic Commercial Enterprise");
+                Console.WriteLine("3 - Freezing Frost");
+                Console.WriteLine("4 - Fanged Metropolis");
+                Console.WriteLine("5 - The Yielding Mire");
+                Console.WriteLine("6 - Thundering Lightning");
+                Console.WriteLine("7 - Wandering Tales");
+                Console.WriteLine("8 - Eagle of the Twilight Line");
+                Console.WriteLine("9 - Guardian of the New Metropolis");
+                Console.WriteLine("10 - Ten Thousand Facades");
+                Console.WriteLine("11 - Genius of the Stars");
+                Console.WriteLine("12 - White Night");
+                Console.WriteLine("13 - Chaos and Order");
+                Console.WriteLine("14 - The Wailing Host");
+                Console.WriteLine("15 - Endless Eclipse");
+                Console.WriteLine("16 - The Great Theater");
+                Console.WriteLine("17 - The Wind-Soaked Breeze");
+                Console.WriteLine("18 - The Resonant Deep Sea");
+                Console.WriteLine("19 - The Unconstrained");
+                Console.WriteLine("20 - The Surging Storm");
+                Console.WriteLine("21 - The Blazing Sun");
+                Console.WriteLine("22 - The Unmoving Frontline");
+                Console.WriteLine("23 - The Unbreakable Bone");
+                Console.WriteLine("24 - The Unyielding Will");
+                Console.WriteLine("25 - The Unstoppable Charge");
+                Console.WriteLine("26 - The Unseen Shadow");
+                Console.WriteLine("27 - The Unending Nightmare");
+                Console.WriteLine("28 - The Unfading Memory");
+                Console.WriteLine("29 - The Unwavering Faith");
+                Console.WriteLine("30 - The Unbreakable Promise");
 
+                Console.WriteLine("\nВведите номер набора (или 0 для пропуска):");
                 string input = GetUserInput();
 
                 if (int.TryParse(input, out int setChoice))
                 {
                     if (setChoice == 0)
                     {
-                        Console.WriteLine("\n✓ ВЫБОР АРТЕФАКТОВ ЗАВЕРШЕН");
+                        Console.WriteLine("Пропуск выбора набора");
                         break;
                     }
-
-                    if (setChoice < 1 || setChoice > 22)
+                    else if (setChoice >= 1 && setChoice <= 30)
                     {
-                        ShowErrorMessage("Неверный выбор. Введите число от 1 до 22");
-                        continue;
-                    }
+                        Console.WriteLine($"\nВыбран набор: {GetSetName(setChoice)}");
 
-                    string selectedSetName = GetSetName(setChoice);
+                        Console.WriteLine("Сколько слотов использовать для этого набора? (2 или 4):");
+                        string slotInput = GetUserInput();
 
-                    if (IsSetAlreadySelected(selectedSets, selectedSetName))
-                    {
-                        ShowErrorMessage($"Сет '{selectedSetName}' уже выбран! Пожалуйста, выберите другой сет.");
-                        continue;
-                    }
-
-                    Console.WriteLine("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                    Console.WriteLine("  ВЫБЕРИТЕ КОЛИЧЕСТВО ДИСКОВ:");
-                    Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                    Console.Write("Введите 2 или 4: ");
-
-                    string quantityInput = GetUserInput();
-
-                    if (int.TryParse(quantityInput, out int quantityChoice) && (quantityChoice == 2 || quantityChoice == 4))
-                    {
-                        if (quantityChoice > remainingSlots)
+                        if (int.TryParse(slotInput, out int slots) && (slots == 2 || slots == 4))
                         {
-                            ShowErrorMessage($"Недостаточно слотов! Вы выбрали {quantityChoice} дисков, но осталось только {remainingSlots} слотов");
-                            continue;
-                        }
+                            if (usedSlots + slots <= totalSlots)
+                            {
+                                usedSlots += slots;
+                                selectedSets.Add($"{GetSetName(setChoice)} ({slots} слота)");
 
-                        int stacks = 1;
-                        if (NeedsStacks(selectedSetName, quantityChoice))
+                                // Применяем бонусы набора
+                                ApplySetBonuses(setChoice, slots);
+
+                                Console.WriteLine($"✓ Добавлен набор {GetSetName(setChoice)} на {slots} слота");
+                                Console.WriteLine($"✓ Всего использовано слотов: {usedSlots}/6");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Недостаточно свободных слотов!");
+                            }
+                        }
+                        else
                         {
-                            stacks = GetStacksForSet(selectedSetName, quantityChoice);
+                            Console.WriteLine("Неверный выбор! Используйте 2 или 4 слота");
                         }
-
-                        ProcessArtifactSetSelection(setChoice, quantityChoice, stacks, ref usedSlots, selectedSets);
                     }
                     else
                     {
-                        ShowErrorMessage("Неверный ввод. Введите 2 или 4");
+                        Console.WriteLine("Неверный выбор набора!");
                     }
                 }
                 else
                 {
-                    ShowErrorMessage("Неверный ввод. Введите число от 1 до 22");
+                    Console.WriteLine("Неверный ввод!");
+                }
+
+                if (usedSlots >= totalSlots)
+                {
+                    Console.WriteLine("\n✓ Все 6 слотов артефактов заполнены!");
+                    break;
+                }
+
+                Console.WriteLine("\nХотите добавить еще один набор? (y/n):");
+                string continueInput = GetUserInput().ToLower();
+                if (continueInput != "y" && continueInput != "yes" && continueInput != "д" && continueInput != "да")
+                {
+                    break;
                 }
             }
 
-            // Выбор главных статов для слотов 4, 5, 6
-            SelectMainStatsForArtifacts();
-
-            // Выбор сабстатов для всех артефактов
-            SelectSubstatsForArtifacts();
-
-            ShowArtifactsSummary(usedSlots, selectedSets);
+            // Выбор дополнительных статов для артефактов
+            SelectArtifactSubstats();
         }
 
         static void SetupFixedArtifactStats()
         {
-            Console.WriteLine("\n══════════════════════════════════════════════════════════════");
-            Console.WriteLine("  УСТАНОВКА ФИКСИРОВАННЫХ СТАТОВ ДЛЯ СЛОТОВ 1-3:");
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
+            // Слот 1: HP
+            currentStats.HP += 1000;
+            currentStats.HPPercent += 0.10;
 
-            // Слот 1: HP - 2200
-            currentStats.HP += 2200;
-            Console.WriteLine($"✓ Слот 1: HP +2200");
+            // Слот 2: ATK
+            currentStats.ScalingStat *= 1.15;
 
-            // Слот 2: ATK - 316
-            currentStats.ScalingStat += 316;
-            Console.WriteLine($"✓ Слот 2: ATK +316");
+            // Слот 3: DEF
+            currentStats.DEF += 200;
+            currentStats.DEFPercentStat += 0.12;
 
-            // Слот 3: DEF - 184
-            currentStats.DEF += 184;
-            Console.WriteLine($"✓ Слот 3: DEF +184");
-
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
+            Console.WriteLine("✓ Установлены фиксированные статы для слотов 1-3:");
+            Console.WriteLine("  Слот 1: HP +1000, HP% +10%");
+            Console.WriteLine("  Слот 2: ATK% +15%");
+            Console.WriteLine("  Слот 3: DEF +200, DEF% +12%");
         }
 
-        static void SelectMainStatsForArtifacts()
+        static string GetSetName(int setChoice)
+        {
+            var setNames = new Dictionary<int, string>
+            {
+                {1, "Meteor Hunter"}, {2, "Pan-Galactic Commercial Enterprise"}, {3, "Freezing Frost"},
+                {4, "Fanged Metropolis"}, {5, "The Yielding Mire"}, {6, "Thundering Lightning"},
+                {7, "Wandering Tales"}, {8, "Eagle of the Twilight Line"}, {9, "Guardian of the New Metropolis"},
+                {10, "Ten Thousand Facades"}, {11, "Genius of the Stars"}, {12, "White Night"},
+                {13, "Chaos and Order"}, {14, "The Wailing Host"}, {15, "Endless Eclipse"},
+                {16, "The Great Theater"}, {17, "The Wind-Soaked Breeze"}, {18, "The Resonant Deep Sea"},
+                {19, "The Unconstrained"}, {20, "The Surging Storm"}, {21, "The Blazing Sun"},
+                {22, "The Unmoving Frontline"}, {23, "The Unbreakable Bone"}, {24, "The Unyielding Will"},
+                {25, "The Unstoppable Charge"}, {26, "The Unseen Shadow"}, {27, "The Unending Nightmare"},
+                {28, "The Unfading Memory"}, {29, "The Unwavering Faith"}, {30, "The Unbreakable Promise"}
+            };
+
+            return setNames.ContainsKey(setChoice) ? setNames[setChoice] : "Unknown Set";
+        }
+
+        static void ApplySetBonuses(int setChoice, int slots)
+        {
+            // Пример применения бонусов для нескольких наборов
+            switch (setChoice)
+            {
+                case 1: // Meteor Hunter
+                    if (slots >= 2) currentStats.DMGBonus += 0.10;
+                    if (slots >= 4) currentStats.CritRate += 0.12;
+                    break;
+                case 2: // Pan-Galactic Commercial Enterprise
+                    if (slots >= 2) currentStats.EffectHitRate += 0.10;
+                    if (slots >= 4) currentStats.ScalingStat *= 1.25;
+                    break;
+                case 8: // Eagle of the Twilight Line
+                    if (slots >= 2) currentStats.WindDMG += 0.10;
+                    if (slots >= 4) currentStats.DMGBonus += 0.08;
+                    break;
+                case 21: // The Blazing Sun
+                    if (slots >= 2) currentStats.FireDMG += 0.10;
+                    if (slots >= 4) currentStats.DMGBonus += 0.12;
+                    break;
+                default:
+                    // Стандартные бонусы для других наборов
+                    if (slots >= 2) currentStats.DMGBonus += 0.08;
+                    if (slots >= 4) currentStats.CritDMG += 0.15;
+                    break;
+            }
+        }
+
+        static void SelectArtifactSubstats()
         {
             Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║             ВЫБОР ГЛАВНЫХ СТАТОВ ДЛЯ СЛОТОВ 4-6             ║");
+            Console.WriteLine("║                ВЫБОР ДОПОЛНИТЕЛЬНЫХ СТАТОВ                   ║");
             Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
 
-            // Слот 4
-            Console.WriteLine("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("                   ВЫБОР СТАТА ДЛЯ СЛОТА 4:");
-            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("1 - HP% (30%)");
-            Console.WriteLine("2 - DEF% (48%)");
-            Console.WriteLine("3 - ATK% (30%)");
-            Console.WriteLine("4 - Crit Rate% (24%)");
-            Console.WriteLine("5 - Crit DMG% (48%)");
-            Console.WriteLine("6 - Anomaly Proficiency (92)");
+            Console.WriteLine("\nТеперь выберите дополнительные статы для артефактов.");
+            Console.WriteLine("Вы можете добавлять различные статы без ограничений.");
 
-            string slot4Input = GetUserInput();
-            ProcessSlot4MainStat(slot4Input);
-
-            // Слот 5
-            Console.WriteLine("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("                   ВЫБОР СТАТА ДЛЯ СЛОТА 5:");
-            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("1 - HP% (30%)");
-            Console.WriteLine("2 - DEF% (48%)");
-            Console.WriteLine("3 - ATK% (30%)");
-            Console.WriteLine("4 - PEN% (24%)");
-            Console.WriteLine("5 - Electric DMG% (30%)");
-            Console.WriteLine("6 - Fire DMG% (30%)");
-            Console.WriteLine("7 - Ice DMG% (30%)");
-            Console.WriteLine("8 - Physical DMG% (30%)");
-            Console.WriteLine("9 - Ether DMG% (30%)");
-
-            string slot5Input = GetUserInput();
-            ProcessSlot5MainStat(slot5Input);
-
-            // Слот 6
-            Console.WriteLine("\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("                   ВЫБОР СТАТА ДЛЯ СЛОТА 6:");
-            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine("1 - HP% (30%)");
-            Console.WriteLine("2 - DEF% (48%)");
-            Console.WriteLine("3 - ATK% (30%)");
-            Console.WriteLine("4 - Anomaly Mastery% (30%)");
-            Console.WriteLine("5 - Impact% (18%)");
-            Console.WriteLine("6 - Energy Regen% (60%)");
-
-            string slot6Input = GetUserInput();
-            ProcessSlot6MainStat(slot6Input);
-        }
-
-        static void ProcessSlot4MainStat(string input)
-        {
-            if (int.TryParse(input, out int choice))
+            var availableSubstats = new List<ArtifactSubstat>
             {
-                switch (choice)
-                {
-                    case 1:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("✓ Слот 4: HP% +30%");
-                        break;
-                    case 2:
-                        currentStats.DEFPercentStat += 0.48;
-                        Console.WriteLine("✓ Слот 4: DEF% +48%");
-                        break;
-                    case 3:
-                        currentStats.ScalingStat *= 1.30;
-                        Console.WriteLine("✓ Слот 4: ATK% +30%");
-                        break;
-                    case 4:
-                        currentStats.CritRate += 0.24;
-                        Console.WriteLine("✓ Слот 4: Crit Rate% +24%");
-                        break;
-                    case 5:
-                        currentStats.CritDMG += 0.48;
-                        Console.WriteLine("✓ Слот 4: Crit DMG% +48%");
-                        break;
-                    case 6:
-                        currentStats.AnomalyProficiency += 92;
-                        Console.WriteLine("✓ Слот 4: Anomaly Proficiency +92");
-                        break;
-                    default:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("Неверный выбор! Установлен HP% +30%");
-                        break;
-                }
-            }
-            else
-            {
-                currentStats.HPPercent += 0.30;
-                Console.WriteLine("Неверный ввод! Установлен HP% +30%");
-            }
-        }
-
-        static void ProcessSlot5MainStat(string input)
-        {
-            if (int.TryParse(input, out int choice))
-            {
-                switch (choice)
-                {
-                    case 1:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("✓ Слот 5: HP% +30%");
-                        break;
-                    case 2:
-                        currentStats.DEFPercentStat += 0.48;
-                        Console.WriteLine("✓ Слот 5: DEF% +48%");
-                        break;
-                    case 3:
-                        currentStats.ScalingStat *= 1.30;
-                        Console.WriteLine("✓ Слот 5: ATK% +30%");
-                        break;
-                    case 4:
-                        currentStats.PENRatio += 0.24;
-                        Console.WriteLine("✓ Слот 5: PEN% +24%");
-                        break;
-                    case 5:
-                        currentStats.ElectricDMG += 0.30;
-                        Console.WriteLine("✓ Слот 5: Electric DMG% +30%");
-                        break;
-                    case 6:
-                        currentStats.FireDMG += 0.30;
-                        Console.WriteLine("✓ Слот 5: Fire DMG% +30%");
-                        break;
-                    case 7:
-                        currentStats.IceDMG += 0.30;
-                        Console.WriteLine("✓ Слот 5: Ice DMG% +30%");
-                        break;
-                    case 8:
-                        currentStats.PhysicalDMG += 0.30;
-                        Console.WriteLine("✓ Слот 5: Physical DMG% +30%");
-                        break;
-                    case 9:
-                        currentStats.EtherDMG += 0.30;
-                        Console.WriteLine("✓ Слот 5: Ether DMG% +30%");
-                        break;
-                    default:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("Неверный выбор! Установлен HP% +30%");
-                        break;
-                }
-            }
-            else
-            {
-                currentStats.HPPercent += 0.30;
-                Console.WriteLine("Неверный ввод! Установлен HP% +30%");
-            }
-        }
-
-        static void ProcessSlot6MainStat(string input)
-        {
-            if (int.TryParse(input, out int choice))
-            {
-                switch (choice)
-                {
-                    case 1:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("✓ Слот 6: HP% +30%");
-                        break;
-                    case 2:
-                        currentStats.DEFPercentStat += 0.48;
-                        Console.WriteLine("✓ Слот 6: DEF% +48%");
-                        break;
-                    case 3:
-                        currentStats.ScalingStat *= 1.30;
-                        Console.WriteLine("✓ Слот 6: ATK% +30%");
-                        break;
-                    case 4:
-                        currentStats.AnomalyMastery += 0.30;
-                        Console.WriteLine("✓ Слот 6: Anomaly Mastery% +30%");
-                        break;
-                    case 5:
-                        currentStats.Impact += 0.18;
-                        Console.WriteLine("✓ Слот 6: Impact% +18%");
-                        break;
-                    case 6:
-                        currentStats.EnergyRegen += 0.60;
-                        Console.WriteLine("✓ Слот 6: Energy Regen% +60%");
-                        break;
-                    default:
-                        currentStats.HPPercent += 0.30;
-                        Console.WriteLine("Неверный выбор! Установлен HP% +30%");
-                        break;
-                }
-            }
-            else
-            {
-                currentStats.HPPercent += 0.30;
-                Console.WriteLine("Неверный ввод! Установлен HP% +30%");
-            }
-        }
-
-        static void SelectSubstatsForArtifacts()
-        {
-            Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                  ВЫБОР САБСТАТОВ АРТЕФАКТОВ                 ║");
-            Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
-
-            Console.WriteLine("Выберите сабстаты для артефактов (можно выбрать несколько):");
-            Console.WriteLine("1 - HP (112 за 1 прок)");
-            Console.WriteLine("2 - ATK (19 за 1 прок)");
-            Console.WriteLine("3 - DEF (15 за 1 прок)");
-            Console.WriteLine("4 - HP% (3% за 1 прок)");
-            Console.WriteLine("5 - ATK% (3% за 1 прок)");
-            Console.WriteLine("6 - DEF% (4.8% за 1 прок)");
-            Console.WriteLine("7 - PEN (9 за 1 прок)");
-            Console.WriteLine("8 - Crit Rate% (2.4% за 1 прок)");
-            Console.WriteLine("9 - Crit DMG% (4.8% за 1 прок)");
-            Console.WriteLine("10 - Anomaly Proficiency (9 за 1 прок)");
-            Console.WriteLine("0 - ЗАВЕРШИТЬ ВЫБОР САБСТАТОВ");
+                new ArtifactSubstat { Name = "Crit Rate", BaseValue = 0.025 },
+                new ArtifactSubstat { Name = "Crit DMG", BaseValue = 0.05 },
+                new ArtifactSubstat { Name = "ATK%", BaseValue = 0.04 },
+                new ArtifactSubstat { Name = "HP%", BaseValue = 0.04 },
+                new ArtifactSubstat { Name = "DEF%", BaseValue = 0.05 },
+                new ArtifactSubstat { Name = "Elemental DMG", BaseValue = 0.04 },
+                new ArtifactSubstat { Name = "Anomaly Mastery", BaseValue = 12.5 },
+                new ArtifactSubstat { Name = "Anomaly Proficiency", BaseValue = 12.5 },
+                new ArtifactSubstat { Name = "Impact", BaseValue = 12.5 },
+                new ArtifactSubstat { Name = "Energy Regen", BaseValue = 0.04 },
+                new ArtifactSubstat { Name = "Effect Hit Rate", BaseValue = 0.04 }
+            };
 
             while (true)
             {
-                Console.Write("\nВведите номер сабстата (0 для завершения): ");
-                string input = GetUserInput();
-
-                if (input == "0")
+                Console.WriteLine("\nДоступные дополнительные статы:");
+                for (int i = 0; i < availableSubstats.Count; i++)
                 {
-                    Console.WriteLine("✓ Выбор сабстатов завершен");
-                    break;
+                    var substat = availableSubstats[i];
+                    Console.WriteLine($"{i + 1} - {substat.Name} (база: {substat.BaseValue:P1})");
                 }
 
-                if (int.TryParse(input, out int substatChoice) && substatChoice >= 1 && substatChoice <= 10)
+                Console.WriteLine("\nВведите номер стата для добавления (или 0 для завершения):");
+                string input = GetUserInput();
+
+                if (int.TryParse(input, out int substatChoice))
                 {
-                    ProcessSubstatSelection(substatChoice);
+                    if (substatChoice == 0)
+                    {
+                        break;
+                    }
+                    else if (substatChoice >= 1 && substatChoice <= availableSubstats.Count)
+                    {
+                        var selectedSubstat = availableSubstats[substatChoice - 1];
+
+                        Console.WriteLine($"\nВыбран: {selectedSubstat.Name}");
+                        Console.WriteLine($"Сколько раз добавить этот стат? (1-10):");
+                        string rollInput = GetUserInput();
+
+                        if (int.TryParse(rollInput, out int rolls) && rolls >= 1 && rolls <= 10)
+                        {
+                            var existingSubstat = artifactSubstats.FirstOrDefault(s => s.Name == selectedSubstat.Name);
+                            if (existingSubstat != null)
+                            {
+                                existingSubstat.Rolls += rolls;
+                            }
+                            else
+                            {
+                                artifactSubstats.Add(new ArtifactSubstat
+                                {
+                                    Name = selectedSubstat.Name,
+                                    BaseValue = selectedSubstat.BaseValue,
+                                    Rolls = rolls
+                                });
+                            }
+
+                            // Применяем бонус к текущим статам
+                            ApplySubstatBonus(selectedSubstat.Name, selectedSubstat.BaseValue * rolls);
+
+                            Console.WriteLine($"✓ Добавлено {rolls} раз(а) {selectedSubstat.Name}");
+                            Console.WriteLine($"✓ Общий бонус: {selectedSubstat.BaseValue * rolls:P1}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Неверное количество!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Неверный выбор стата!");
+                    }
                 }
                 else
                 {
-                    ShowErrorMessage("Неверный выбор. Введите число от 1 до 10");
+                    Console.WriteLine("Неверный ввод!");
                 }
-            }
-        }
 
-        static void ProcessSubstatSelection(int substatChoice)
-        {
-            Console.Write($"Введите количество проков для этого сабстата (1-10): ");
-            string rollsInput = GetUserInput();
-
-            if (int.TryParse(rollsInput, out int rolls) && rolls >= 1 && rolls <= 10)
-            {
-                ArtifactSubstat substat = new ArtifactSubstat();
-                substat.Rolls = rolls;
-
-                switch (substatChoice)
+                Console.WriteLine("\nХотите добавить еще один дополнительный стат? (y/n):");
+                string continueInput = GetUserInput().ToLower();
+                if (continueInput != "y" && continueInput != "yes" && continueInput != "д" && continueInput != "да")
                 {
-                    case 1:
-                        substat.Name = "HP";
-                        substat.BaseValue = 112;
-                        currentStats.HP += substat.TotalValue;
-                        break;
-                    case 2:
-                        substat.Name = "ATK";
-                        substat.BaseValue = 19;
-                        currentStats.ScalingStat += substat.TotalValue;
-                        break;
-                    case 3:
-                        substat.Name = "DEF";
-                        substat.BaseValue = 15;
-                        currentStats.DEF += substat.TotalValue;
-                        break;
-                    case 4:
-                        substat.Name = "HP%";
-                        substat.BaseValue = 0.03;
-                        currentStats.HPPercent += substat.TotalValue;
-                        break;
-                    case 5:
-                        substat.Name = "ATK%";
-                        substat.BaseValue = 0.03;
-                        currentStats.ScalingStat *= (1 + substat.TotalValue);
-                        break;
-                    case 6:
-                        substat.Name = "DEF%";
-                        substat.BaseValue = 0.048;
-                        currentStats.DEFPercentStat += substat.TotalValue;
-                        break;
-                    case 7:
-                        substat.Name = "PEN";
-                        substat.BaseValue = 9;
-                        currentStats.FlatPEN += substat.TotalValue;
-                        break;
-                    case 8:
-                        substat.Name = "Crit Rate%";
-                        substat.BaseValue = 0.024;
-                        currentStats.CritRate += substat.TotalValue;
-                        break;
-                    case 9:
-                        substat.Name = "Crit DMG%";
-                        substat.BaseValue = 0.048;
-                        currentStats.CritDMG += substat.TotalValue;
-                        break;
-                    case 10:
-                        substat.Name = "Anomaly Proficiency";
-                        substat.BaseValue = 9;
-                        currentStats.AnomalyProficiency += substat.TotalValue;
-                        break;
-                }
-
-                artifactSubstats.Add(substat);
-                Console.WriteLine($"✓ Добавлен {substat.Name}: {substat.BaseValue} × {substat.Rolls} = {substat.TotalValue}");
-            }
-            else
-            {
-                ShowErrorMessage("Неверное количество проков! Установлено 1 прок");
-            }
-        }
-
-        static void ProcessArtifactSetSelection(int setChoice, int quantityChoice, int stacks, ref int usedSlots, List<string> selectedSets)
-        {
-            string setName = GetSetName(setChoice);
-            string displayName = $"{setName} ({quantityChoice} диска)";
-
-            if (stacks > 1)
-            {
-                displayName += $" [Стаки: {stacks}]";
-            }
-
-            AddArtifactBonuses(setName, quantityChoice, stacks);
-
-            selectedSets.Add(displayName);
-            usedSlots += quantityChoice;
-
-            Console.WriteLine("\n══════════════════════════════════════════════════════════════");
-            Console.WriteLine($"  ✓ ВЫ УСПЕШНО ВЫБРАЛИ:");
-            Console.WriteLine($"     Сет: {setName}");
-            Console.WriteLine($"     Количество: {quantityChoice} диска");
-            if (stacks > 1)
-            {
-                Console.WriteLine($"     Стаки: {stacks}");
-            }
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
-
-            ShowCurrentArtifacts(selectedSets, usedSlots);
-        }
-
-        static void AddArtifactBonuses(string setName, int quantity, int stacks)
-        {
-            switch (setName)
-            {
-                case "Fanged Metal":
-                    if (quantity == 2)
-                        currentStats.DMGBonus += 0.1;
-                    if (quantity == 4)
-                        currentStats.DMGBonus += 0.35;
                     break;
-
-                case "Thunder Metal":
-                    if (quantity == 2)
-                        currentStats.DMGBonus += 0.1;
-                    if (quantity == 4)
-                        currentStats.ScalingStat *= 1.28;
-                    break;
-
-                case "Branch & Blade Song":
-                    if (quantity == 2)
-                        currentStats.CritDMG += 0.16;
-                    if (quantity == 4)
-                    {
-                        currentStats.CritRate += 0.12;
-                        currentStats.CritDMG += 0.30;
-                    }
-                    break;
-
-                case "Shadow Harmony":
-                    if (quantity == 2)
-                        currentStats.DMGBonus += 0.15;
-                    if (quantity == 4)
-                    {
-                        double atkBonus = 0.04 * stacks;
-                        double critBonus = 0.04 * stacks;
-                        currentStats.ScalingStat *= (1 + atkBonus);
-                        currentStats.CritRate += critBonus;
-                    }
-                    break;
-
-                case "Chaotic Metal":
-                    if (quantity == 2)
-                        currentStats.DMGBonus += 0.1;
-                    if (quantity == 4)
-                    {
-                        currentStats.CritRate += 0.33;
-                        currentStats.CritDMG += 0.20;
-                    }
-                    break;
-
-                default:
-                    if (quantity == 2)
-                        currentStats.DMGBonus += 0.1;
-                    if (quantity == 4)
-                        currentStats.DMGBonus += 0.2;
-                    break;
-            }
-
-            Console.WriteLine($"✓ Добавлены бонусы от сета {setName}");
-        }
-
-        static bool NeedsStacks(string setName, int quantity)
-        {
-            var setsWithStacks = new List<string>
-            {
-                "Shadow Harmony",
-                "Astral Voice",
-                "Woodpecker Electro",
-                "Yunkui Tales"
-            };
-
-            return quantity == 4 && setsWithStacks.Contains(setName);
-        }
-
-        static int GetStacksForSet(string setName, int quantity)
-        {
-            if (quantity != 4) return 1;
-
-            int maxStacks = setName switch
-            {
-                "Shadow Harmony" => 3,
-                "Astral Voice" => 3,
-                "Woodpecker Electro" => 3,
-                "Yunkui Tales" => 3,
-                _ => 1
-            };
-
-            if (maxStacks == 1) return 1;
-
-            Console.WriteLine($"\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.WriteLine($"  ВЫБЕРИТЕ КОЛИЧЕСТВО СТАКОВ ДЛЯ {setName}:");
-            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-            Console.Write($"Введите количество стаков (1-{maxStacks}): ");
-
-            string input = GetUserInput();
-
-            if (int.TryParse(input, out int stacks) && stacks >= 1 && stacks <= maxStacks)
-            {
-                return stacks;
-            }
-
-            Console.WriteLine($"Неверный ввод! Установлено значение по умолчанию: 1");
-            return 1;
-        }
-
-        static bool IsSetAlreadySelected(List<string> selectedSets, string setName)
-        {
-            foreach (string selectedSet in selectedSets)
-            {
-                if (selectedSet.StartsWith(setName))
-                {
-                    return true;
                 }
             }
-            return false;
+
+            ShowArtifactSummary();
         }
 
-        static void ShowCurrentArtifacts(List<string> selectedSets, int usedSlots)
+        static void ApplySubstatBonus(string substatName, double value)
         {
-            Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            Console.WriteLine($"СТАТУС: Использовано слотов: {usedSlots}/6");
-            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-            Console.WriteLine("\nТЕКУЩИЙ НАБОР АРТЕФАКТОВ:");
-            Console.WriteLine("──────────────────────────────────────────────────────────────");
-            for (int i = 0; i < selectedSets.Count; i++)
+            switch (substatName)
             {
-                Console.WriteLine($"   {i + 1}. {selectedSets[i]}");
+                case "Crit Rate":
+                    currentStats.CritRate += value;
+                    break;
+                case "Crit DMG":
+                    currentStats.CritDMG += value;
+                    break;
+                case "ATK%":
+                    currentStats.ScalingStat *= (1 + value);
+                    break;
+                case "HP%":
+                    currentStats.HPPercent += value;
+                    break;
+                case "DEF%":
+                    currentStats.DEFPercentStat += value;
+                    break;
+                case "Elemental DMG":
+                    currentStats.DMGBonus += value;
+                    break;
+                case "Anomaly Mastery":
+                    currentStats.AnomalyMastery += value;
+                    break;
+                case "Anomaly Proficiency":
+                    currentStats.AnomalyProficiency += value;
+                    break;
+                case "Impact":
+                    currentStats.Impact += value;
+                    break;
+                case "Energy Regen":
+                    currentStats.EnergyRegen += value;
+                    break;
+                case "Effect Hit Rate":
+                    currentStats.EffectHitRate += value;
+                    break;
             }
-            Console.WriteLine("──────────────────────────────────────────────────────────────");
         }
 
-        static void ShowArtifactsSummary(int usedSlots, List<string> selectedSets)
+        static void ShowArtifactSummary()
         {
             Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            if (usedSlots == 6)
-            {
-                Console.WriteLine("║                 ВСЕ СЛОТЫ ЗАПОЛНЕНЫ!                         ║");
-            }
-            else
-            {
-                Console.WriteLine($"║           ВЫБОР ЗАВЕРШЕН: {usedSlots}/6 слотов           ║");
-            }
+            Console.WriteLine("║                 СВОДКА ПО АРТЕФАКТАМ                        ║");
             Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
 
-            Console.WriteLine("\n══════════════════════════════════════════════════════════════");
-            Console.WriteLine("                   ИТОГИ ВЫБОРА АРТЕФАКТОВ:");
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
-            Console.WriteLine($"Использовано слотов: {usedSlots}/6");
-            Console.WriteLine("Выбранные сеты:");
-            foreach (var set in selectedSets)
+            Console.WriteLine("\nДополнительные статы:");
+            foreach (var substat in artifactSubstats)
             {
-                Console.WriteLine($"  • {set}");
+                Console.WriteLine($"  {substat.Name}: {substat.TotalValue:P1} ({substat.Rolls} раз)");
             }
 
-            if (artifactSubstats.Count > 0)
-            {
-                Console.WriteLine("\nВыбранные сабстаты:");
-                foreach (var substat in artifactSubstats)
-                {
-                    Console.WriteLine($"  • {substat.Name}: {substat.BaseValue} × {substat.Rolls} = {substat.TotalValue}");
-                }
-            }
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
-        }
-
-        static string GetSetName(int setNumber)
-        {
-            switch (setNumber)
-            {
-                case 1: return "Moonlight Lullaby";
-                case 2: return "Dawn's Bloom";
-                case 3: return "King of the Summit";
-                case 4: return "Yunkui Tales";
-                case 5: return "Phaethon's Melody";
-                case 6: return "Shadow Harmony";
-                case 7: return "Astral Voice";
-                case 8: return "Branch & Blade Song";
-                case 9: return "Fanged Metal";
-                case 10: return "Polar Metal";
-                case 11: return "Thunder Metal";
-                case 12: return "Chaotic Metal";
-                case 13: return "Inferno Metal";
-                case 14: return "Proto Punk";
-                case 15: return "Chaos Jazz";
-                case 16: return "Swing Jazz";
-                case 17: return "Soul Rock";
-                case 18: return "Hormone Punk";
-                case 19: return "Freedom Blues";
-                case 20: return "Shockstar Disco";
-                case 21: return "Puffer Electro";
-                case 22: return "Woodpecker Electro";
-                default: return "Неизвестный сет";
-            }
+            Console.WriteLine($"\nОбщий бонус урона: {currentStats.DMGBonus:P1}");
+            Console.WriteLine($"Крит шанс: {currentStats.CritRate:P1}");
+            Console.WriteLine($"Крит урон: {currentStats.CritDMG:P1}");
+            Console.WriteLine($"Атака: {currentStats.ScalingStat:F0}");
         }
 
         static void CalculateFinalDamage()
         {
             Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                   ФИНАЛЬНЫЙ РАСЧЕТ УРОНА                    ║");
+            Console.WriteLine("║                 РАСЧЕТ ФИНАЛЬНОГО УРОНА                     ║");
             Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
 
-            // Применяем проценты к HP и DEF
-            double totalHP = currentStats.HP * (1 + currentStats.HPPercent);
-            double totalDEF = currentStats.DEF * (1 + currentStats.DEFPercentStat);
-
+            // Base DMG = Skill MV * Scaling Stat + Flat MV
             currentStats.BaseDMG = currentStats.SkillMV * currentStats.ScalingStat + currentStats.FlatMV;
 
-            // Суммируем все бонусы урона
-            double totalDMGBonus = currentStats.DMGBonus + currentStats.ElectricDMG + currentStats.FireDMG +
-                                  currentStats.IceDMG + currentStats.PhysicalDMG + currentStats.EtherDMG;
-            double dmgMod = 1 + totalDMGBonus;
+            // Crit Modifier
+            double critMultiplier = 1.0 + (currentStats.CritRate > 0 ? currentStats.CritDMG : 0);
+            currentStats.IsCrit = new Random().NextDouble() <= currentStats.CritRate;
 
-            Random rand = new Random();
-            currentStats.IsCrit = rand.NextDouble() <= currentStats.CritRate;
-            double critMod = currentStats.IsCrit ? (1 + currentStats.CritDMG) : 1;
+            // DEF Modifier
+            double defMultiplier = CalculateDEFMultiplier();
 
-            double resMod = 1 - currentStats.AttributeRES - currentStats.AllTypeRES +
-                           currentStats.RESReduction + currentStats.RESPEN;
-            resMod = Math.Max(0.1, resMod);
+            // RES Modifier
+            double resMultiplier = CalculateRESMultiplier();
 
-            double targetDEF = currentStats.TargetBaseDEF * (1 + currentStats.DEFPercent - currentStats.DEFReduction - currentStats.DEFIgnore);
-            double effectiveDEF = targetDEF * (1 - currentStats.PENRatio) - currentStats.FlatPEN;
-            effectiveDEF = Math.Max(0, effectiveDEF);
-            double defMod = currentStats.LevelCoefficient / (currentStats.LevelCoefficient + effectiveDEF);
+            // Final Damage Calculation
+            currentStats.FinalDamage = currentStats.BaseDMG * (1 + currentStats.DMGBonus);
 
-            double stunMod = 1 + (currentStats.StunBonus / 100);
+            if (currentStats.IsCrit)
+            {
+                currentStats.FinalDamage *= critMultiplier;
+            }
 
-            currentStats.FinalDamage = currentStats.BaseDMG * dmgMod * critMod * resMod * defMod * stunMod;
+            currentStats.FinalDamage *= defMultiplier * resMultiplier;
 
-            DisplayFinalResults(dmgMod, critMod, resMod, defMod, stunMod, totalHP, totalDEF);
+            ShowDamageResults();
         }
 
-        static void DisplayFinalResults(double dmgMod, double critMod, double resMod, double defMod, double stunMod, double totalHP, double totalDEF)
+        static double CalculateDEFMultiplier()
         {
-            Console.WriteLine("\n══════════════════════════════════════════════════════════════");
-            Console.WriteLine("                     РЕЗУЛЬТАТЫ РАСЧЕТА");
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
+            double targetDEF = currentStats.TargetBaseDEF * (1 + currentStats.DEFPercent);
+            double defReduction = targetDEF * (1 - currentStats.DEFReduction);
+            double defIgnore = defReduction * (1 - currentStats.DEFIgnore);
+            double finalDEF = Math.Max(defIgnore - currentStats.FlatPEN, 0);
 
-            Console.WriteLine($"\n📊 БАЗОВЫЕ КОМПОНЕНТЫ:");
-            Console.WriteLine($"   Множитель навыка (Skill MV): {currentStats.SkillMV:P1}");
-            Console.WriteLine($"   Суммарная атака (Scaling Stat): {currentStats.ScalingStat:F0}");
-            Console.WriteLine($"   Базовый урон (Base DMG): {currentStats.BaseDMG:F0}");
-            Console.WriteLine($"   Суммарное HP: {totalHP:F0} (база +{currentStats.HPPercent:P1})");
-            Console.WriteLine($"   Суммарная защита: {totalDEF:F0} (база +{currentStats.DEFPercentStat:P1})");
-
-            Console.WriteLine($"\n🎯 МОДИФИКАТОРЫ:");
-            Console.WriteLine($"   Общий бонус урона: {currentStats.DMGBonus:P1}");
-            Console.WriteLine($"   Электрический урон: {currentStats.ElectricDMG:P1}");
-            Console.WriteLine($"   Огненный урон: {currentStats.FireDMG:P1}");
-            Console.WriteLine($"   Ледяной урон: {currentStats.IceDMG:P1}");
-            Console.WriteLine($"   Физический урон: {currentStats.PhysicalDMG:P1}");
-            Console.WriteLine($"   Эфирный урон: {currentStats.EtherDMG:P1}");
-            Console.WriteLine($"   Итоговый множитель урона: {dmgMod:P1}");
-            Console.WriteLine($"   Крит шанс: {currentStats.CritRate:P1}");
-            Console.WriteLine($"   Крит урон: {currentStats.CritDMG:P1}");
-            Console.WriteLine($"   Крит множитель: {critMod:P1} {(currentStats.IsCrit ? "🎯 КРИТ!" : "")}");
-            Console.WriteLine($"   Сопротивление (RES): {resMod:P1}");
-            Console.WriteLine($"   Защита (DEF): {defMod:P1}");
-            Console.WriteLine($"   Оглушение (Stun): {stunMod:P1}");
-            Console.WriteLine($"   Anomaly Proficiency: {currentStats.AnomalyProficiency:F0}");
-            Console.WriteLine($"   Anomaly Mastery: {currentStats.AnomalyMastery:P1}");
-            Console.WriteLine($"   Impact: {currentStats.Impact:P1}");
-            Console.WriteLine($"   Energy Regen: {currentStats.EnergyRegen:P1}");
-
-            Console.WriteLine($"\n💫 ФИНАЛЬНЫЙ УРОН: {currentStats.FinalDamage:F0}");
-            Console.WriteLine("══════════════════════════════════════════════════════════════");
-
-            Console.WriteLine($"\n🧮 ФОРМУЛА:");
-            Console.WriteLine($"   BaseDMG × DMG% × Crit × RES × DEF × Stun");
-            Console.WriteLine($"   {currentStats.BaseDMG:F0} × {dmgMod:P1} × {critMod:P1} × {resMod:P1} × {defMod:P1} × {stunMod:P1}");
-            Console.WriteLine($"   = {currentStats.FinalDamage:F0}");
+            return currentStats.LevelCoefficient / (currentStats.LevelCoefficient + finalDEF);
         }
 
-        static string GetUserInput()
+        static double CalculateRESMultiplier()
         {
-            Console.Write("> ");
-            return Console.ReadLine();
+            double totalRES = currentStats.AttributeRES + currentStats.AllTypeRES;
+            double resAfterReduction = totalRES * (1 - currentStats.RESReduction);
+            double resAfterPEN = resAfterReduction - currentStats.RESPEN;
+
+            if (resAfterPEN >= 0.75) return 1 / (1 + 4 * resAfterPEN);
+            if (resAfterPEN >= 0) return 1 - resAfterPEN;
+            return 1 - resAfterPEN / 2;
         }
 
-        static void ShowErrorMessage(string message)
+        static void ShowDamageResults()
         {
-            Console.WriteLine($"\n❌ {message}");
+            Console.WriteLine("\n┌────────────────────────────────────────────────────────────┐");
+            Console.WriteLine("│                      РЕЗУЛЬТАТЫ РАСЧЕТА                     │");
+            Console.WriteLine("└────────────────────────────────────────────────────────────┘");
+
+            Console.WriteLine($"\nБазовый урон: {currentStats.BaseDMG:F0}");
+            Console.WriteLine($"Множитель навыка: {currentStats.SkillMV:P1}");
+            Console.WriteLine($"Стат атаки: {currentStats.ScalingStat:F0}");
+            Console.WriteLine($"Бонус урона: {currentStats.DMGBonus:P1}");
+
+            Console.WriteLine($"\nКрит шанс: {currentStats.CritRate:P1}");
+            Console.WriteLine($"Крит урон: {currentStats.CritDMG:P1}");
+            Console.WriteLine($"Крит: {(currentStats.IsCrit ? "✓ ДА" : "✗ НЕТ")}");
+
+            Console.WriteLine($"\n╔══════════════════════════════════════════════════════════════╗");
+            Console.WriteLine($"║                ФИНАЛЬНЫЙ УРОН: {currentStats.FinalDamage:F0}                 ║");
+            Console.WriteLine("╚══════════════════════════════════════════════════════════════╝");
+
+            if (currentStats.IsCrit)
+            {
+                double nonCritDamage = currentStats.BaseDMG * (1 + currentStats.DMGBonus) *
+                                     CalculateDEFMultiplier() * CalculateRESMultiplier();
+                Console.WriteLine($"\nУрон без крита: {nonCritDamage:F0}");
+                Console.WriteLine($"Множитель крита: x{currentStats.CritDMG + 1:F2}");
+            }
         }
 
         static int GetStackLevel(int min, int max)
         {
-            Console.WriteLine($"\nВыберите уровень наложения ({min}-{max}):");
-            string input = GetUserInput();
-
-            if (int.TryParse(input, out int level) && level >= min && level <= max)
+            while (true)
             {
-                return level;
-            }
+                Console.WriteLine($"\nВведите уровень наложения ({min}-{max}):");
+                string input = GetUserInput();
 
-            Console.WriteLine($"Неверный уровень наложения! Установлен по умолчанию: {min}");
-            return min;
+                if (int.TryParse(input, out int level) && level >= min && level <= max)
+                {
+                    return level;
+                }
+                else
+                {
+                    ShowErrorMessage($"Неверный уровень! Введите число от {min} до {max}");
+                }
+            }
         }
 
-        static int GetRefinementLevel()
+        static string GetUserInput()
         {
-            Console.WriteLine("\nВведите уровень наложения оружия (1-5):");
-            string input = GetUserInput();
-
-            if (int.TryParse(input, out int level) && level >= 1 && level <= 5)
-            {
-                return level;
-            }
-
-            Console.WriteLine("Неверный ввод, установлен уровень наложения по умолчанию: 1");
-            return 1;
+            Console.Write("\n>>> ");
+            return Console.ReadLine()?.Trim() ?? "";
         }
 
-        static int GetStackCount(int min, int max, string prompt)
+        static void ShowErrorMessage(string message)
         {
-            Console.WriteLine($"\nВведите {prompt} ({min}-{max}):");
-            string input = GetUserInput();
-
-            if (int.TryParse(input, out int count) && count >= min && count <= max)
-            {
-                return count;
-            }
-
-            Console.WriteLine($"Неверный ввод, установлено количество стаков по умолчанию: {min}");
-            return min;
+            Console.WriteLine($"\n✗ ОШИБКА: {message}");
         }
     }
 }
