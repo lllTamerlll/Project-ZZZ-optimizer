@@ -16,7 +16,7 @@ namespace Damage_TestConsole
         public string name3 = "King of the Summit";
         //YunkuiTales
         public string name4 = "Yunkui Tales";
-        //PhaethonMelody
+        //PhaethonsMelody
         public string name5 = "Phaethon's Melody";
         //ShadowHarmony
         public string name6 = "Shadow Harmony";
@@ -75,7 +75,7 @@ namespace Damage_TestConsole
             }
             public class ShadowHarmony
             {
-                double[] ShadowHarmony_4_ATK { get; } = { 0.04, 0.08, 0.12 };
+                public double[] ShadowHarmony_4_ATK { get; } = { 0.04, 0.08, 0.12 };
             }
             public class ThunderMetal
             {
@@ -139,7 +139,7 @@ namespace Damage_TestConsole
         {
             public class ChaosJazz
             {
-                double ChaosJazz_2_AP { get; } = 30;
+                public double ChaosJazz_2_AP { get; } = 30;
             }
             public class FreedomBlues
             {

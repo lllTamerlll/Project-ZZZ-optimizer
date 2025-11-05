@@ -11,6 +11,52 @@ namespace Damage_TestConsole
     {
 
         public string name = "Харумаса";
+
+        public class Basic_stats
+        {
+            public class HP
+            {
+                public double HP_Basic = 7405;
+            }
+            public class ATK
+            {
+                public double ATK_Basic = 915;
+
+            }
+            public class DEF
+            {
+                public double DEF_Basic = 600;
+            }
+            public class Impact
+            {
+                public double Impact_Basic = 90;
+
+            }
+            public class CRIT_Rate
+            {
+                public double CRITRate_Basic = 0.194;
+            }
+            public class CRIT_DMG
+            {
+                public double CRITDMG_Basic = 0.50;
+            }
+            public class AM
+            {
+                public double AM_Basic = 80;
+            }
+            public class AP
+            {
+                public double AP_Basic = 95;
+            }
+            public class Pen_per
+            {
+                public double Penper_Basic = 0;
+            }
+            public class Energy_Regen
+            {
+                public double EnergyRegen_Basic = 1.2;
+            }
+        }
             public class Skills
         {
             public class Basic
